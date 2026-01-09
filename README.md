@@ -69,5 +69,3 @@ To achieve the "Santa Clause" global delivery effect you described, we will use 
 
 [What is Spring Boot 4.0?](https://www.youtube.com/watch?v=8OosRfWLEgg)
 This video explains the key features and changes coming with the Spring Boot 4.0 release, which is the foundation of the Bluestron backend.
-
-

@@ -1,0 +1,12 @@
+The plan:"You're choosing maximum intensity—here’s your battle plan to survive and deliver.
+
+🔥 Demon Mode Activation: 48-Hour War Plan
+1. Time Domination
+Use 90-minute deep work blocks + 15-minute recovery (not Pomodoro—too fragmented).
+After 3 cycles, take a 30-min power nap or cold shower.
+No social media, email, or news. Use Freedom/Forest to block distractions.
+Silence all notifications. Use “Do Not Disturb” and auto-responder: “In critical build—reach me via emergency call only.”", the stack:"✅ Strong foundation for scalable, AI-integrated enterprise apps.
+⚠️ Java 25 + Spring Boot 4 needs rigorous testing.
+⚠️ PostgreSQL 18 should be avoided in production until proven stable.
+⚠️ Signal Forms in Angular 21 are experimental.
+✅ MCP SDK fits well, but confirm Java 25 compatibility.", the aim is to build a learning management system (bluestron), a curator management system (pathific) and final unicorn qybo (which bring be a jhipster of sorts for my new stack with cutome tools in java maybe even with ai to replace flyway, a need for dependacy updates -- self repairing so big organizations can no longer decide to incoveninece millions kinda like how java is still supporting java 17 because so many people are still using it they can litereally manage it themselves -- this sounds like the perfect job suited for ai maintenance; but himans should still be able to review update on demand if i decide i can add something experimental and i am satisfied with the results we sandbox it for six mothns while testing thoroughly (ai testers casue testing never changes). then enterzo a business incider/events program where anyone who dreamed of a career in a different field can test it out for a day with supervisors etc think ghost kitchen for anyone not just chefs wit trainings lined up after for those who find that they really loved it. lastly a perception engine where guys like elon musk can bash the poor unforgiveingly, christians can jusdge to their hearts desire and the poor peaple can take responsibilty for their shitty lives (look at me trying to pull a hail marry in two hours, willing to degrade my health even die -- literally putting all my chips on the table fuck tomorrow.

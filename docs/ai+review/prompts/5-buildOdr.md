@@ -1,0 +1,1 @@
+But what of the oder, the prompt is perfect but, should homepage be first with stubs then categories, then courses; how can i ensure admin can edit everyhting, how will it resolve to each of the instructions in a singular acrhitecture?

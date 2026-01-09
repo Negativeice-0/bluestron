@@ -1,0 +1,11 @@
+STep by step guide on below
+nextjs @latest-ui
+springboot 3.5.9 - api
+jsk 21
+custom migration runner to replace flyway
+psql 18
+
+--
+moudle by module build, proceed only after verification, all stand aline can be built from different ais so long as module plus architectureal schema uploaded.
+
+produce the pormpt that will enable all of the above in an opinionated manner with little to know more questions/errors or asumptions.

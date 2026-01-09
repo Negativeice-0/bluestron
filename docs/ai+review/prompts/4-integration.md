@@ -1,0 +1,1 @@
+I still don't see a full scheck list of all of bluestron requirements and how to apply any of the pror prompts to it in any other ai or how i can remeber all of this?
