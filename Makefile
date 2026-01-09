@@ -1,7 +1,7 @@
 # Load env if present
 -include ops/.env.local
 
-.PHONY: setup db-init api-dev ui-dev migrate test typecheck
+.PHONY: setup db-init api-build api-dev ui-dev migrate test typecheck
 
 setup:
 	@echo "==> Setup: install frontend deps"
@@ -14,8 +14,8 @@ db-init:
 	psql -U postgres -h localhost -f ops/db-init.sql
 
 api-build:
-    @echo "==> Build bsapi (Spring Boot)"
-    cd bsapi && ./mvnw clean package -DskipTests
+	@echo "==> Build bsapi (Spring Boot)"
+	cd bsapi && ./mvnw clean package -DskipTests
 
 api-dev:
 	@echo "==> Run bsapi (Spring Boot)"
