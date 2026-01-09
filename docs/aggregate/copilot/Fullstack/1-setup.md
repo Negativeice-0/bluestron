@@ -1,3 +1,16 @@
+Since we are ignoring the latest then we shall use maven with application.yaml, but can we look for shorter names (e.g bsapi for backend. bsui for frontend, bsdb for postgres and where are the postgres commands with all the grant table permissions?), then walk me through a deep dive sptep by step of the above starting from spring intializer.
+
+
+
+
+
+
+
+
+
+
+
+
 ### Bluestron module 0 deep dive (Maven, Spring Boot, Next.js) with short names
 
 You want Maven with `application.yaml`, short project names—**bsapi** (backend), **bsui** (frontend), **bsdb** (Postgres)—and explicit Postgres commands with roles and grants. Here’s a step-by-step build from Spring Initializr through local verification, keeping everything minimalistic, mobile-first, and reproducible.

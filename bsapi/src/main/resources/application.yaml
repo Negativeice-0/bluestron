@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/bsdb
     username: bsapi_user
-    password: ${BSAPI_DB_PASSWORD}
+    password: bsapi_password
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

@@ -14,3 +14,5 @@ Calling setState synchronously within an effect body causes cascading renders th
   10 |   }, [])
   11 |
   12 |   useEffect(() => {", can front end handle it or will backedn be needed -- sufice to say i have not yet added it and don't think we need yet as per the requirements maybe we will add it later if reqiested.
+
+We shall proceed to module one 1 (schemas and openapi endpoints) since I have removed consent banner, you can merely note that you should use best practyices for both nextjs, spring, java, etc, and we can always roll back later to ui once everything is up and running

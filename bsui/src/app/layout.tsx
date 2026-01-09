@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   description: "High-quality courses and services by Bluestron.",
   icons: {
-    icon: "/bs-clean.png",
+    icon: "/logo.svg",
   },
 };
 
