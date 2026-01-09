@@ -14,9 +14,9 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        format_sql: true
+        format-sql: true
         jdbc:
-          time_zone: UTC
+          time-zone: UTC
     open-in-view: false
   sql:
     init:
@@ -34,11 +34,3 @@ management:
 logging:
   level:
     root: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
-
-cors:
-  allowed-origins: http://localhost:3000
-  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
-  allowed-headers: "*"
-  allow-credentials: true
