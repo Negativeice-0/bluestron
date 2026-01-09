@@ -1,7 +1,3 @@
-This exhaustive **Bluestron System Specification** acts as your high-fidelity blueprint. It converts every line from the **Bluestron Training Business Guide** into exact technical values and verification steps.
-
----
-
 ### 📋 The Bluestron "Supreme Architecture" Master Checklist
 
 This guide is structured by **Dependency Priority** (Layer 1 must be verified before Layer 2 can exist).
@@ -59,13 +55,8 @@ make check-seed    # Verifies the 5 categories are populated
 
 ```
 
-### 💡 Senior Pro-Tip: The "Santa" Deployment
+### 💡 Senior Pro-Tip: The "Santa" Deployment -- imaginary and not in requirements but pretty cool if i manage to hack it.
 
 To achieve the "Santa Clause" global delivery effect you described, we will use **Next.js ISR (Incremental Static Regeneration)**.
 
 * **The Value:** When the Admin updates a Course's price or a Logo in the CMS at 3:00 AM, the changes are "delivered" to all global users instantly without you needing to rebuild the entire application.
-
-**Would you like me to output the complete source code for "Module 1: The Foundation" (CORS, Security, and Schema) to begin these verification tests?**
-
-[What is Spring Boot 4.0?](https://www.youtube.com/watch?v=8OosRfWLEgg)
-This video explains the key features and changes coming with the Spring Boot 4.0 release, which is the foundation of the Bluestron backend.
