@@ -12,7 +12,7 @@ public class Runner {
     public static void main(String[] args) throws Exception {
         String url = System.getenv().getOrDefault("BSAPI_DB_URL", "jdbc:postgresql://localhost:5432/bsdb");
         String user = System.getenv().getOrDefault("BSAPI_DB_USER", "bsapi_user");
-        String pass = System.getenv().getOrDefault("BSAPI_DB_PASSWORD", "CHANGE_ME_LOCAL");
+        String pass = System.getenv().getOrDefault("BSAPI_DB_PASSWORD", "bsapi_password");
 
         try (Connection conn = DriverManager.getConnection(url, user, pass)) {
             List<Migration> migrations = List.of(

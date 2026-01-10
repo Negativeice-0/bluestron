@@ -18,6 +18,12 @@ spring:
         jdbc:
           time-zone: UTC
     open-in-view: false
+    # only for dev -- full auth in production
+#renders this a security risk
+  security:
+    user:
+      name: admin
+      password: lsetga
 
 management:
   endpoints:

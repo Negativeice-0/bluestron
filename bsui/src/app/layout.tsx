@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
+import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import "./globals.css";
 
@@ -43,18 +43,7 @@ export default function RootLayout({
         </main>
 
         {/* Standardized Footer */}
-        <footer className="px-4 py-8 border-t border-navy/10 bg-gray-50/50">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-navy/60">
-            <div className="flex items-center gap-2 font-semibold">
-              <span className="text-lime-500">-</span> Bluestron
-            </div>
-            <p>© {new Date().getFullYear()} Bluestron. All rights reserved.</p>
-            <div className="flex gap-4">
-              <Link href="/privacy" className="hover:underline">Privacy</Link>
-              <Link href="/terms" className="hover:underline">Terms</Link>
-            </div>
-          </div>
-        </footer>
+       <Footer />
       </body>
     </html>
   );
