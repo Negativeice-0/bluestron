@@ -1,0 +1,1 @@
+Migration was succefully applied, secutity config updated to include courses (config still returning json as expected) but curl does nothing, why am i getting a 401 status code?
