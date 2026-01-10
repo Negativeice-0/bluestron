@@ -18,15 +18,12 @@ spring:
         jdbc:
           time-zone: UTC
     open-in-view: false
-  sql:
-    init:
-      mode: never
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,mappings,info
   endpoint:
     health:
       show-details: when_authorized
