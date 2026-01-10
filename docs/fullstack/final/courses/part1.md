@@ -409,7 +409,9 @@ List<Migration> migrations = List.of(
 
 bash
 make migrate
-Check DB:
+
+
+# !Check DB:
 
 # !bash
 psql -U bsapi_user -d bsdb -c "\dt"
