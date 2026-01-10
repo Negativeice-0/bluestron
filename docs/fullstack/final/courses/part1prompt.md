@@ -1,0 +1,1 @@
+Categories is a success, I just don't know about the ui it's all black and white not adhering to bluestron navy blue, orange and softwhite but we can deal with that later, lets scaffold Course entity → controller → UI page next in the same detailed, end-to-end style.
