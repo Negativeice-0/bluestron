@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.ke.bluestron.bsapi.dto.CourseDTO;
+import co.ke.bluestron.bsapi.dto.CourseResponse;
 import co.ke.bluestron.bsapi.entity.Course;
 import co.ke.bluestron.bsapi.service.CourseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,8 +44,15 @@ public class CourseController {
     }
 
     @Operation(summary = "Get course by slug")
-    @GetMapping("/{slug}")
-    public ResponseEntity<Course> get(@PathVariable String slug) {
-        return ResponseEntity.ok(service.getBySlug(slug));
-    }
+   @GetMapping("/{slug}")
+public ResponseEntity<CourseResponse> get(@PathVariable String slug) {
+    Course c = service.getBySlug(slug);
+    return ResponseEntity.ok(new CourseResponse(
+        c.getId(), c.getSlug(), c.getTitle(),
+        c.getShortDescription(), c.getFullDescription(),
+        c.getLearningOutcomes(), c.getThumbnailUrl(),
+        c.getStatus(), c.getCategory()
+    ));
+}
+
 }

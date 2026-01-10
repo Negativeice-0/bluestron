@@ -1,15 +1,23 @@
-Great — let’s finish the **Courses UI page** so you can see the full end‑to‑end flow for courses, just like we did for categories.
+Perfect — now that you’ve confirmed the backend is inserting courses successfully, let’s tighten up the **Courses UI page** so it’s stricter TypeScript, modern Next.js best practices, and styled with Bluestron’s vibrant palette (purple + softwhite + orange). This way you can verify end‑to‑end with fresh data and no chance of silent errors.
 
 ---
 
-## Frontend: Courses page
+## 🎨 Updated Courses Page (Next.js + TS + Tailwind)
 
 ```tsx
 // bsui/src/app/courses/page.tsx
 'use client'
+
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+
+interface Category {
+  id: number
+  name: string
+  slug: string
+}
 
 interface Course {
   id: number
@@ -19,12 +27,13 @@ interface Course {
   fullDescription?: string
   thumbnailUrl?: string
   status: string
-  category: { id: number; name: string }
+  category: Category
 }
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     fetch('http://localhost:8080/api/courses')
@@ -32,37 +41,61 @@ export default function CoursesPage() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         return res.json()
       })
-      .then(setCourses)
+      .then(data => setCourses(data))
       .catch(err => setError(err.message))
+      .finally(() => setLoading(false))
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col bg-softwhite text-navy">
+    <div className="min-h-screen flex flex-col bg-softwhite text-purple-900">
       <Navbar />
-      <main className="flex-1 px-4 py-10 max-w-5xl mx-auto">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6">Courses</h1>
+      <main className="flex-1 px-4 py-10 max-w-6xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-extrabold mb-8 text-purple-800">
+          Explore Our Courses
+        </h1>
+
+        {loading && <p className="text-orange">Loading courses...</p>}
         {error && (
           <div className="p-4 bg-red-100 text-red-700 rounded-md mb-4">
             Failed to load courses: {error}
           </div>
         )}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {courses.map(course => (
-            <div key={course.id} className="p-6 border border-navy/10 rounded-lg shadow-sm hover:shadow-md transition">
+            <div
+              key={course.id}
+              className="p-6 border border-purple-200 rounded-lg shadow hover:shadow-lg transition bg-white"
+            >
               {course.thumbnailUrl && (
-                <img src={course.thumbnailUrl} alt={course.title} className="w-full h-40 object-cover rounded-md mb-4" />
+                <img
+                  src={course.thumbnailUrl}
+                  alt={course.title}
+                  className="w-full h-40 object-cover rounded-md mb-4"
+                />
               )}
-              <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
-              <p className="text-navy/70 mb-2">{course.shortDescription || 'No description provided.'}</p>
-              <span className={`inline-block px-2 py-1 text-xs rounded-md ${
-                course.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'
-              }`}>
+              <h2 className="text-xl font-semibold mb-2 text-purple-900">
+                {course.title}
+              </h2>
+              <p className="text-purple-700 mb-3">
+                {course.shortDescription || 'No description provided.'}
+              </p>
+              <span
+                className={`inline-block px-3 py-1 text-xs font-medium rounded-md ${
+                  course.status === 'published'
+                    ? 'bg-orange text-white'
+                    : 'bg-gray-200 text-gray-600'
+                }`}
+              >
                 {course.status}
               </span>
               <div className="mt-4">
-                <a href={`/courses/${course.slug}`} className="px-3 py-2 bg-orange text-white rounded-md text-sm">
+                <Link
+                  href={`/courses/${course.slug}`}
+                  className="px-4 py-2 bg-purple-700 text-softwhite rounded-md text-sm hover:bg-purple-800 transition"
+                >
                   View details
-                </a>
+                </Link>
               </div>
             </div>
           ))}
@@ -76,62 +109,60 @@ export default function CoursesPage() {
 
 ---
 
-## Verification workflow
+## 🧪 Fresh Data for Verification
+# !bash
+make api-dev
 
-1. **Run migration**  
+
+
+1. **Create a new category**  
    ```bash
-   make migrate
+   curl -X POST http://localhost:8080/api/categories \
+     -H "Content-Type: application/json" \
+     -d '{
+       "slug": "data-analysis",
+       "name": "Data Analysis & Management",
+       "description": "Courses on data cleaning, visualization, and analytics",
+       "status": "active"
+     }'
    ```
-   → Creates `course` table.
 
-2. **Start backend**  
-   ```bash
-   make api-dev
-   ```
-
-3. **Create course via curl**  
+2. **Create a new course** (linked to that category’s ID, say `4`):  
    ```bash
    curl -X POST http://localhost:8080/api/courses \
      -H "Content-Type: application/json" \
      -d '{
-       "slug": "advanced-me-health-programs",
-       "title": "Advanced M&E and Data Management for Health Programs",
-       "shortDescription": "Deep-dive into M&E for health.",
-       "fullDescription": "Full syllabus...",
-       "learningOutcomes": ["Design M&E frameworks", "Analyze health data"],
-       "thumbnailUrl": "https://example.com/img/health-me.png",
-       "categoryId": 1,
+       "slug": "power-bi-essentials",
+       "title": "Power BI Essentials",
+       "shortDescription": "Learn to build dashboards and reports with Power BI.",
+       "fullDescription": "This course covers data modeling, visualization, and publishing interactive dashboards using Power BI.",
+       "thumbnailUrl": "https://example.com/img/power-bi.png",
+       "categoryId": 4,
        "status": "published"
      }'
    ```
 
-4. **List courses via curl**  
+3. **List courses**  
    ```bash
    curl http://localhost:8080/api/courses
    ```
 
-5. **Get course by slug**  
+4. **Get course by slug**  
    ```bash
-   curl http://localhost:8080/api/courses/advanced-me-health-programs
+   curl http://localhost:8080/api/courses/power-bi-essentials
    ```
 
-6. **Check DB directly**  
-   ```bash
-   psql -U bsapi_user -d bsdb -c "SELECT id, slug, title, status FROM course;"
-   ```
-
-7. **Run frontend**  
+5. **Run frontend**  
    ```bash
    make ui-dev
    ```
    → Visit `http://localhost:3000/courses`.  
-   → Page shows course cards with title, description, thumbnail, status badge, and “View details” button.
+   → You should see vibrant purple/orange/softwhite cards with your new course.
 
 ---
 
-## Next step
+## 🚀 Next step
 
-- Add **Course detail page** (`/courses/[slug]`) to show full description, learning outcomes, and a **Register** button.  
-- Then implement **CourseInstance** (cohorts) and **Registration** entities with their controllers, so the detail page can display upcoming sessions and allow enrolment.
+Now that the **Courses page** is strict TypeScript and styled properly, the next logical piece is the **Course detail page** (`/courses/[slug]`) with a **Register Now** button. That will close the loop from backend → curl → UI → registration.  
 
-Would you like me to scaffold the **Course detail page + Registration flow** next, so you can click “View details” and actually register through the UI?
+Would you like me to scaffold the **Course detail page + Registration form** next so you can actually test enrolments end‑to‑end?

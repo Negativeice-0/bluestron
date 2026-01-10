@@ -408,43 +408,16 @@ List<Migration> migrations = List.of(
 # !Run:
 
 bash
-make migrate
+make api-build
 
+then
+
+make migrate
 
 # !Check DB:
 
 # !bash
 psql -U bsapi_user -d bsdb -c "\dt"
 → You should now see both course_category and course.
-
----
-
-## Curl verification
-
-- **Create course**
-```bash
-curl -X POST http://localhost:8080/api/courses \
-  -H "Content-Type: application/json" \
-  -d '{
-    "slug": "advanced-me-health-programs",
-    "title": "Advanced M&E and Data Management for Health Programs",
-    "shortDescription": "Deep-dive into M&E for health.",
-    "fullDescription": "Full syllabus...",
-    "learningOutcomes": ["Design M&E frameworks", "Analyze health data"],
-    "thumbnailUrl": "https://example.com/img/health-me.png",
-    "categoryId": 1,
-    "status": "published"
-  }'
-```
-
-- **List courses**
-```bash
-curl "http://localhost:8080/api/courses?categoryId=1&status=published"
-```
-
-- **Get course by slug**
-```bash
-curl http://localhost:8080/api/courses/advanced-me-health-programs
-```
 
 ---
