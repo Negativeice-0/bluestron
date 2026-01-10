@@ -60,3 +60,23 @@ make check-seed    # Verifies the 5 categories are populated
 To achieve the "Santa Clause" global delivery effect you described, we will use **Next.js ISR (Incremental Static Regeneration)**.
 
 * **The Value:** When the Admin updates a Course's price or a Logo in the CMS at 3:00 AM, the changes are "delivered" to all global users instantly without you needing to rebuild the entire application.
+
+
+Module 0 (system skeleton): ✅ Complete
+Backend project, frontend project, configs, DB roles, Makefile, health endpoints.
+
+Module 1 (core domain, categories + courses):
+
+Categories: ✅ End‑to‑end working (migration, entity, DTO, repo, service, controller, curl, UI).
+
+Courses: ⚠️ Migration initially missing slug, but now scaffolded with full entity, DTO, repo, service, controller, curl, and UI detail page. Needs verification after migration rerun.
+
+Remaining in Module 1: CourseInstances (cohorts), Registrations, Trainers, Testimonials, FeaturedContent, Blog, Services. These are similar patterns but not yet fully scaffolded.
+
+Module 2 (auth/admin API): ❌ Not started
+
+Module 3 (admin UI): ❌ Not started
+
+Module 4 (public UI composites, filters, SEO): ❌ Not started
+
+Module 5 (payments & notifications): ❌ Not started

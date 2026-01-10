@@ -3,6 +3,8 @@ package co.ke.bluestron.bsapi.entity;
 import java.time.Instant;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -50,6 +52,8 @@ public class Course {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id")
+    //When serializing a CourseCategory from within a Course, ignore the courses field
+    @JsonIgnoreProperties({"courses"}) // prevent infinite recursion
     private CourseCategory category;
 
     @Column(nullable = false, length = 20)

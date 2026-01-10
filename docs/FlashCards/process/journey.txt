@@ -1,0 +1,25 @@
+This took a good four months stewing in my head,
+ but really the learning started much earlier.
+
+The pressure + my insistance
+on finding better workflows finally paid off.
+
+Without ai i woudl normally take a few weeks
+building a full site, then iterate to new projects
+using it as a template and taking code from it into
+the new project.
+
+Now, i only tweak the prompt and get virgin code.
+
+The deadline didn't allow me to use my old ways,
+not enough time, but since i have been struggling
+with how to use ai better with forex and programming
+back to back for years with everything else with standing
+finally i see the fruits of my labor.
+
+I almost cracked at the point i had a long chat with qwen ai
+which lead to the crazy mode.md document in this directory.
+
+Suffice to say i a lot of prompting, code regenration and 
+project dumping occured.
+

@@ -16,7 +16,8 @@ public class Runner {
 
         try (Connection conn = DriverManager.getConnection(url, user, pass)) {
             List<Migration> migrations = List.of(
-                new V1__InitTrainingSchema()
+                new V1__InitTrainingSchema(),
+                new V2__InitCourseSchema()
             );
             for (Migration m : migrations) {
                 System.out.printf("Applying %s - %s%n", m.version(), m.description());

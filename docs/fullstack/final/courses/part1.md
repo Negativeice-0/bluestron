@@ -21,13 +21,30 @@ bsapi/
 // bsapi/src/main/java/co/ke/bluestron/bsapi/entity/Course.java
 package co.ke.bluestron.bsapi.entity;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 /**
  * Course entity belongs to a CourseCategory.
  * Includes audit fields for admin tracking.
+ * 
+ * ANALOGY: Think of getters as the backend equivalent of frontend READ/DISPLAY operations,
+ * and setters as the backend equivalent of frontend EDIT operations.
+ * Just like a frontend has edit/delete buttons to modify data,
+ * the backend provides setters to modify entity fields and getters to read them.
  */
 @Entity
 @Table(name = "course")
@@ -56,6 +73,8 @@ public class Course {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id")
+    //When serializing a CourseCategory from within a Course, ignore the courses field
+    @JsonIgnoreProperties({"courses"}) // prevent infinite recursion
     private CourseCategory category;
 
     @Column(nullable = false, length = 20)
@@ -70,7 +89,115 @@ public class Course {
     private String createdBy;
     private String updatedBy;
 
-    // getters/setters omitted for brevity
+    // ============ GETTERS (Backend READ operations) ============
+    // These are like the frontend's display/read operations - they retrieve data for viewing
+    
+    public Long getId() {
+        return id;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public String getFullDescription() {
+        return fullDescription;
+    }
+
+    public List<String> getLearningOutcomes() {
+        return learningOutcomes;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public CourseCategory getCategory() {
+        return category;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    // ============ SETTERS (Backend EDIT operations) ============
+    // These are like the frontend's edit buttons - they modify the entity data
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
+
+    public void setFullDescription(String fullDescription) {
+        this.fullDescription = fullDescription;
+    }
+
+    public void setLearningOutcomes(List<String> learningOutcomes) {
+        this.learningOutcomes = learningOutcomes;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public void setCategory(CourseCategory category) {
+        this.category = category;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
 }
 ```
 
@@ -270,6 +397,26 @@ public class V2__InitCourseSchema implements Migration {
 
 ---
 
+# !!Update Runner.java:
+
+java
+List<Migration> migrations = List.of(
+    new V1__InitTrainingSchema(),
+    new V2__InitCourseSchema()
+);
+
+# !Run:
+
+bash
+make migrate
+Check DB:
+
+# !bash
+psql -U bsapi_user -d bsdb -c "\dt"
+→ You should now see both course_category and course.
+
+---
+
 ## Curl verification
 
 - **Create course**
@@ -299,10 +446,3 @@ curl http://localhost:8080/api/courses/advanced-me-health-programs
 ```
 
 ---
-
-## Frontend: Courses page
-
-```tsx
-// bsui/src/app/courses/page.tsx
-'use client'
-import { useEffect,

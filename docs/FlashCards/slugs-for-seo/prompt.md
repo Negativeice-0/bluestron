@@ -1,0 +1,1 @@
+Just to be clear the previous did not have slug, slug won't affect testing with curl for now and we are almost done with the heavel lifting aspects of bluestron if not what percentage have we cleared so far?

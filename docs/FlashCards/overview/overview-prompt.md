@@ -1,4 +1,4 @@
-before we continue, could you use an android app like whatsapp to explain all the above 
+could you use an android app like whatsapp to explain all the above 
 
 i.e getters are like the code behind the ui card displays for whatsapp chats and setters are the code behind the send chat button, 
 
