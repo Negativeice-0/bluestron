@@ -1,0 +1,376 @@
+This is what worked with my current backend and i loved it, i would also like to know how to use it to drop V2... if i had created it using java and for it to take effect in the databse so i van have a new V2..., feel free to inlcude your best recommendation with full implementation details (file paths, commands, should backend be running, would deleting v2.. class and then manually delete from db work?, etc.).
+
+package co.ke.bluestron.bsapi.migration;
+
+import java.sql.Connection;
+import java.sql.Statement;
+
+/**
+ * Creates course_category table with indexes and audit fields.
+ */
+public class V1__InitTrainingSchema implements Migration {
+    @Override public String version() { return "V1"; }
+    @Override public String description() { return "Init training schema (course_category)"; }
+
+    @Override
+    public void up(Connection conn) throws Exception {
+        try (Statement st = conn.createStatement()) {
+            st.execute("""
+                CREATE TABLE IF NOT EXISTS course_category (
+                  id SERIAL PRIMARY KEY,
+                  slug VARCHAR(100) UNIQUE NOT NULL,
+                  name VARCHAR(150) NOT NULL,
+                  description TEXT,
+                  status VARCHAR(20) NOT NULL DEFAULT 'active',
+                  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  created_by VARCHAR(100),
+                  updated_by VARCHAR(100)
+                );
+            """);
+            st.execute("CREATE INDEX IF NOT EXISTS idx_course_category_slug ON course_category(slug);");
+            st.execute("CREATE INDEX IF NOT EXISTS idx_course_category_status ON course_category(status);");
+        }
+    }
+
+    @Override
+    public void down(Connection conn) throws Exception {
+        try (Statement st = conn.createStatement()) {
+            st.execute("DROP TABLE IF EXISTS course_category;");
+        }
+    }
+}
+
+    void up(Connection conn) throws Exception;
+
+package co.ke.bluestron.bsapi.migration;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
+
+/**
+ * Simple Java-based migration runner. Run via Makefile:
+ * make migrate
+ */
+public class Runner {
+    public static void main(String[] args) throws Exception {
+        String url = System.getenv().getOrDefault("BSAPI_DB_URL", "jdbc:postgresql://localhost:5432/bsdb");
+        String user = System.getenv().getOrDefault("BSAPI_DB_USER", "bsapi_user");
+        String pass = System.getenv().getOrDefault("BSAPI_DB_PASSWORD", "bsapi_password");
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+            List<Migration> migrations = List.of(
+                new V1__InitTrainingSchema(),
+                new V2__InitCourseSchema()
+            );
+            for (Migration m : migrations) {
+                System.out.printf("Applying %s - %s%n", m.version(), m.description());
+                m.up(conn);
+            }
+            System.out.println("Migrations applied successfully.");
+        }
+    }
+}
+
+package co.ke.bluestron.bsapi.service;
+
+import java.time.Instant;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import co.ke.bluestron.bsapi.dto.CategoryDTO;
+import co.ke.bluestron.bsapi.entity.CourseCategory;
+import co.ke.bluestron.bsapi.repository.CourseCategoryRepository;
+import jakarta.transaction.Transactional;
+
+/**
+ * Business logic for categories:
+ * - Prevent duplicate slugs
+ * - Set audit fields
+ * - Provide list/get/create/update/delete operations
+ */
+@Service
+public class CategoryService {
+    private final CourseCategoryRepository repo;
+
+    public CategoryService(CourseCategoryRepository repo) {
+        this.repo = repo;
+    }
+
+    public List<CourseCategory> list() {
+        return repo.findAll();
+    }
+
+    public CourseCategory getBySlug(String slug) {
+        return repo.findBySlug(slug).orElseThrow(() -> new IllegalArgumentException("Category not found"));
+    }
+
+    @Transactional
+    public CourseCategory create(CategoryDTO dto, String actor) {
+        if (repo.existsBySlug(dto.slug())) {
+            throw new IllegalArgumentException("Slug already exists");
+        }
+        CourseCategory c = new CourseCategory();
+        c.setSlug(dto.slug());
+        c.setName(dto.name());
+        c.setDescription(dto.description());
+        c.setStatus(dto.status());
+        c.setCreatedBy(actor);
+        c.setUpdatedBy(actor);
+        return repo.save(c);
+    }
+
+    @Transactional
+    public CourseCategory update(String slug, CategoryDTO dto, String actor) {
+        CourseCategory c = getBySlug(slug);
+        c.setName(dto.name());
+        c.setDescription(dto.description());
+        c.setStatus(dto.status());
+        c.setUpdatedBy(actor);
+        c.setUpdatedAt(Instant.now());
+        return repo.save(c);
+    }
+
+    @Transactional
+    public void delete(String slug) {
+        CourseCategory c = getBySlug(slug);
+        repo.delete(c);
+    }
+}
+
+package co.ke.bluestron.bsapi.repository;
+
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import co.ke.bluestron.bsapi.entity.CourseCategory;
+
+/**
+ * JPA repository with convenience lookups.
+ */
+public interface CourseCategoryRepository extends JpaRepository<CourseCategory, Long> {
+    Optional<CourseCategory> findBySlug(String slug);
+    boolean existsBySlug(String slug);
+}
+
+package co.ke.bluestron.bsapi.entity;
+
+import java.time.Instant;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+/**
+ * CourseCategory represents a grouping for courses (e.g., Monitoring & Evaluation).
+ * Audit fields included for future admin tracking.
+ */
+@Entity
+@Table(name = "course_category")
+public class CourseCategory {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 100)
+    private String slug;
+
+    @Column(nullable = false, length = 150)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false, length = 20)
+    private String status = "active";
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt = Instant.now();
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt = Instant.now();
+
+    private String createdBy;
+    private String updatedBy;
+
+    // Getters and setters (omitted for brevity)
+    public Long getId() { return id; }
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public Instant getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+    public String getUpdatedBy() { return updatedBy; }
+    public void setUpdatedBy(String updatedBy) { this.updatedBy = updatedBy; }
+}
+
+package co.ke.bluestron.bsapi.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+/**
+ * DTO for creating/updating categories. Validation ensures clean inputs.
+ */
+public record CategoryDTO(
+    @NotBlank @Size(max = 100) String slug,
+    @NotBlank @Size(max = 150) String name,
+    @Size(max = 10000) String description,
+    @NotBlank @Size(max = 20) String status
+) {}
+
+package co.ke.bluestron.bsapi.controller;
+
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import co.ke.bluestron.bsapi.dto.CategoryDTO;
+import co.ke.bluestron.bsapi.entity.CourseCategory;
+import co.ke.bluestron.bsapi.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
+/**
+ * Public endpoints for categories (Module 1).
+ * In Module 2, we'll add admin-protected endpoints under /api/admin/categories.
+ */
+@Tag(name = "Categories")
+@RestController
+@RequestMapping("/api/categories")
+public class CategoryController {
+    private final CategoryService service;
+
+    public CategoryController(CategoryService service) {
+        this.service = service;
+    }
+
+    @Operation(summary = "List categories")
+    @GetMapping
+    public ResponseEntity<List<CourseCategory>> list() {
+        return ResponseEntity.ok(service.list());
+    }
+
+    @Operation(summary = "Create a category")
+    @PostMapping
+    public ResponseEntity<CourseCategory> create(@Valid @RequestBody CategoryDTO dto) {
+        CourseCategory c = service.create(dto, "system"); // actor will be authenticated user in Module 2
+        return ResponseEntity.status(201).body(c);
+    }
+
+    @Operation(summary = "Get category by slug")
+    @GetMapping("/{slug}")
+    public ResponseEntity<CourseCategory> get(@PathVariable String slug) {
+        return ResponseEntity.ok(service.getBySlug(slug));
+    }
+
+    @Operation(summary = "Update category by slug")
+    @PutMapping("/{slug}")
+    public ResponseEntity<CourseCategory> update(@PathVariable String slug, @Valid @RequestBody CategoryDTO dto) {
+        return ResponseEntity.ok(service.update(slug, dto, "system"));
+    }
+
+    @Operation(summary = "Delete category by slug")
+    @DeleteMapping("/{slug}")
+    public ResponseEntity<Void> delete(@PathVariable String slug) {
+        service.delete(slug);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+package co.ke.bluestron.bsapi.config;
+
+import java.util.List;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+/**
+ * Allow local Next.js frontend to call the API.
+ */
+@Configuration
+public class CorsConfig {
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+}
+
+package co.ke.bluestron.bsapi.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+/**
+ * Minimal security for Module 1:
+ * - Disable CSRF for simplicity (we'll add proper auth in Module 2).
+ * - Permit public API endpoints for verification with curl.
+ * i/e bash "http://localhost:8080/api/categories or courses or etc".
+ */
+@Configuration
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/actuator/**",
+                    "/api/status",
+                    "/api/categories/**",
+                    "/api/courses/**",
+                    "/api/trainers/**",
+                    "/api/testimonials/**",
+                    "/api/service-offerings/**",
+                    "/api/service-enquiries/**",
+                    "/api/registrations/**",
+                    "/api/featured-content/**",
+                    "/api/blog-posts/**",
+                    "/api/homepage/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**"
+                ).permitAll()
+                .anyRequest().permitAll() // allow everything for now
+            )
+            .httpBasic(Customizer.withDefaults());
+        return http.build();
+    }
+}
