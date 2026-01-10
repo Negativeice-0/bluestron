@@ -1,0 +1,1 @@
+it would have been nice to very all of the above with curl, especially admin ui create, how much more is left as a percentage and yes you may proceed to the next step.

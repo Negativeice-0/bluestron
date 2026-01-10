@@ -304,5 +304,5 @@ Validation: DTOs + error envelopes in Spring Boot.
 
 Seed data: Insert sample categories/courses for testing.
 
-👉 Next step: I’ll map DTOs + OpenAPI schema definitions for each entity (so frontend can generate clients cleanly). Do you want me to show the exact JSON schema fragments for OpenAPI (e.g. Course, Registration) now, or keep it high-level until migrations are verified?>, what do the java files do, comment them and can you fill in as per the skeleton what i am actually to fill
+👉 Next step: I’ll map DTOs + OpenAPI schema definitions for each entity (so frontend can generate clients cleanly). Do you want me to show the exact JSON schema fragments for OpenAPI (e.g. Course, Registration) now, or keep it high-level until migrations are verified?
 
