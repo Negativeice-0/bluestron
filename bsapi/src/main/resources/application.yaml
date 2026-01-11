@@ -6,8 +6,8 @@ spring:
     name: bsapi
   datasource:
     url: jdbc:postgresql://localhost:5432/bsdb
-    username: bsapi_user
-    password: bsapi_password
+    username: bsdbu
+    password: bsdbp2Pass&1!
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -24,6 +24,7 @@ spring:
     user:
       name: admin
       password: lsetga
+
 
 management:
   endpoints:
