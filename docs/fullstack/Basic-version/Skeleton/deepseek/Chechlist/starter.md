@@ -1,0 +1,1 @@
+You obviously start with prompt then follwed document.

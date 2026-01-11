@@ -33,3 +33,8 @@ INSERT INTO courses (category_id, title, slug, description, short_description, d
 -- Sample registration
 INSERT INTO registrations (course_id, full_name, email, phone, organization, payment_option) VALUES
 (1, 'John Doe', 'john@example.com', '+254712345678', 'NGO Ltd', 'INVOICE');
+
+-- Add admin user (password: Admin123!)
+-- BCrypt hash for 'Admin123!' (you'll need to generate this)
+INSERT INTO users (email, password, full_name, role) VALUES
+('admin@bluestron.co.ke', '$2a$12$q7v.BhOe5E3z7b5W8pQYQO5v5T6n7v8w9x0y1z2A3B4C5D6E7F8G9H0I1J', 'Bluestron Admin', 'ADMIN');

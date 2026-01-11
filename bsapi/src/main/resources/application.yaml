@@ -24,6 +24,9 @@ spring:
     user:
       name: admin
       password: lsetga
+jwt:
+  secret: ${JWT_SECRET:bluestronTrainingBusinessSecretKeyForJWTSigning2024}
+  expiration: 86400000 # 24 hours
 
 
 management:

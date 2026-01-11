@@ -1,0 +1,1 @@
+YOu might have to do this manully and cross reference with bluestron requirements.

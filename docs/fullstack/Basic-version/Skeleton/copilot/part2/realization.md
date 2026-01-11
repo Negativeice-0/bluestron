@@ -1,0 +1,1 @@
+I started using copilot to fix errors, since it is really good at this even without context, but mostly because it spits out small amounts of (for brevity it always says -- i want full not abbreviations).
