@@ -1,0 +1,1 @@
+Just paste actual and ask: "what prompt would have lead to this masterpiece?".
