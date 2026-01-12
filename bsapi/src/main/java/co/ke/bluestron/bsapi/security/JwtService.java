@@ -35,19 +35,25 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
-    }
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("authorities", userDetails.getAuthorities()
+            .stream()
+            .map(Object::toString)
+            .toList());
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder()
-                .claims(extraClaims)
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                // modern jjwt: just pass the key, algorithm inferred
-                .signWith(getSignInKey())
-                .compact();
-    }
+    return generateToken(claims, userDetails);
+}
+
+public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    return Jwts.builder()
+            .claims(extraClaims)
+            .subject(userDetails.getUsername())
+            .issuedAt(new Date(System.currentTimeMillis()))
+            .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+            .signWith(getSignInKey())
+            .compact();
+}
+
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);

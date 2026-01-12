@@ -1,3 +1,9 @@
+SO jwt hanles tokenomics.
+
+cors handles access.
+
+jwt filter padlocks everything else so you can't pass any information unless you already have token which is ipossible becasue you only get token after login in not before.
+
 package co.ke.bluestron.bsapi.security;
 
 import java.io.IOException;
@@ -62,6 +68,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/auth/**");
+        return path.startsWith("/auth/");
     }
 }

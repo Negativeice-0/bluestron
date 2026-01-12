@@ -9,9 +9,10 @@ const config: Config = {
          'button-glow': 'glow 3s infinite',
       },
       colors: {
-        softwhite: '#F8FAFC',
-        navy: '#0B1F3B',
-        orange: '#FF7A00',
+        navyblue: '#001f3f', 
+        orange: '#ff851b', 
+        softwhite: '#f8f9fa',
+       
       },
       fontFamily: {
         sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Ubuntu', 'Cantarell', 'Noto Sans', 'sans-serif'],

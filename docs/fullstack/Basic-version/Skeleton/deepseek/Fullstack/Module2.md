@@ -309,6 +309,37 @@ Perfect — here’s the **final integrated setup** for Spring Boot 3 / Spring S
 ---
 
 ## 🔐 `SecurityConfig.java`
+##use this ignore that below -- didn't cut it because of cool comments
+```java
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .cors(cors -> cors.configurationSource(request -> {
+            var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+            corsConfig.setAllowedOrigins(List.of("http://localhost:3000"));
+            corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            corsConfig.setAllowedHeaders(List.of("*"));
+            corsConfig.setAllowCredentials(true);
+            return corsConfig;
+        }))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/auth/**").permitAll()
+            .requestMatchers("/api/**").permitAll()
+            .requestMatchers("/actuator/health").permitAll()
+            .anyRequest().authenticated()
+        )
+        .sessionManagement(session ->
+            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}
+
+
+```
+
 
 ```java
 package co.ke.bluestron.bsapi.config;
@@ -352,7 +383,7 @@ public class SecurityConfig {
 
         return http.build();
     }
-}
+} 
 ```
 
 ---
@@ -778,6 +809,156 @@ module.exports = {
 ### **Phase 5: Admin Dashboard**
 
 **File: `bsui/app/admin/page.tsx`**
+This works better
+
+
+Here’s a clean wrap‑up for you, Billy:
+
+---
+
+## 📝 Summary of the explanation
+- Your original `AdminDashboard` was throwing errors because you mixed **inline type annotations** (`: unknown`) inside JSX/TSX, which Next.js/TypeScript doesn’t allow.  
+- You were also relying on **localStorage** for JWT, which is brittle in Next.js App Router.  
+- The modern approach is to:
+  - Store JWT in **cookies** at login.  
+  - Use **server components** (`page.tsx`) to fetch data securely with `cookies()` and `redirect()`.  
+  - Define **interfaces** for your API responses instead of sprinkling `any`/`unknown`.  
+  - Fetch stats server‑side so the page renders with data immediately, no flicker.
+
+---
+
+## 🎯 Prompt to avoid this issue next time
+When you want me to generate Next.js code, use a prompt like:
+
+```
+I’m building a Next.js App Router (v13+) page with TypeScript. 
+Please give me the full source code for a secure admin dashboard that:
+- Uses JWT stored in cookies, not localStorage
+- Fetches data server-side with cookies() and redirect()
+- Defines proper TypeScript interfaces for API responses
+- Redirects non-admin users to /login or /
+- Renders stat cards and quick links with Tailwind
+Make sure the code is modern, valid TSX, and avoids inline type annotations inside JSX.
+```
+
+That way I’ll know to give you **cookie-based auth, server components, and clean TypeScript** without the parsing errors.
+
+---
+
+## ✅ Final full source code
+
+`src/app/admin/page.tsx`
+
+```tsx
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+
+// Define interfaces for API responses
+interface Course { id: number; title: string; }
+interface Category { id: number; name: string; }
+interface Registration { id: number; status: string; }
+
+async function getStats(token: string) {
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const [coursesRes, registrationsRes, categoriesRes] = await Promise.all([
+    fetch('http://localhost:8080/api/courses', { headers, cache: 'no-store' }),
+    fetch('http://localhost:8080/api/registrations', { headers, cache: 'no-store' }),
+    fetch('http://localhost:8080/api/categories', { headers, cache: 'no-store' }),
+  ]);
+
+  const courses: Course[] = await coursesRes.json();
+  const registrations: Registration[] = await registrationsRes.json();
+  const categories: Category[] = await categoriesRes.json();
+
+  return {
+    totalCourses: courses.length,
+    totalRegistrations: registrations.length,
+    totalCategories: categories.length,
+    pendingRegistrations: registrations.filter(r => r.status === 'PENDING').length,
+  };
+}
+
+export default async function AdminDashboard() {
+  const token = cookies().get('token')?.value;
+  if (!token) redirect('/login');
+
+  // Decode JWT payload
+  const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+  const role = payload?.authorities?.[0] || 'USER';
+  if (!role.includes('ADMIN')) redirect('/');
+
+  const stats = await getStats(token);
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h1>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard label="Total Courses" value={stats.totalCourses} color="blue" />
+        <StatCard label="Registrations" value={stats.totalRegistrations} color="green" />
+        <StatCard label="Pending" value={stats.pendingRegistrations} color="yellow" />
+        <StatCard label="Categories" value={stats.totalCategories} color="purple" />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <QuickLink href="/admin/courses" label="Manage Courses" desc="Add, edit, or delete training courses" color="blue" />
+        <QuickLink href="/admin/categories" label="Manage Categories" desc="Organize courses into categories" color="green" />
+        <QuickLink href="/admin/registrations" label="Registrations" desc="View and manage course registrations" color="yellow" />
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <div className="flex items-center">
+        <div className={`bg-${color}-100 p-3 rounded-lg`}>
+          <div className={`w-6 h-6 text-${color}-600`}>★</div>
+        </div>
+        <div className="ml-4">
+          <p className="text-sm font-medium text-gray-600">{label}</p>
+          <p className="text-2xl font-semibold text-gray-900">{value}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuickLink({ href, label, desc, color }: { href: string; label: string; desc: string; color: string }) {
+  return (
+    <a href={href} className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+      <div className="flex items-center">
+        <div className={`bg-${color}-100 p-3 rounded-lg`}>
+          <div className={`w-6 h-6 text-${color}-600`}>→</div>
+        </div>
+        <div className="ml-4">
+          <h3 className="text-lg font-semibold text-gray-900">{label}</h3>
+          <p className="text-gray-600 mt-1">{desc}</p>
+        </div>
+      </div>
+    </a>
+  );
+}
+```
+
+---
+
+This version:
+- ✅ Uses cookies for JWT.  
+- ✅ Redirects non‑admins before rendering.  
+- ✅ Fetches stats server‑side with proper interfaces.  
+- ✅ Avoids inline type annotations inside JSX.  
+- ✅ Tailwind‑ready stat cards and quick links.  
+
+---
+
+Would you like me to also give you the **login page code that sets the JWT cookie** (instead of localStorage) so this dashboard works seamlessly?
+
+
 ```tsx
 'use client';
 

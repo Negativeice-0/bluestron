@@ -3,13 +3,14 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-// This is the LOGIN PAGE
-// Place this file at: src/app/login/page.tsx
-// It handles user login, decodes JWT payload, and redirects based on role.
+// This is the REGISTRATION PAGE
+// Place this file at: src/app/register/page.tsx
+// It handles user registration and then redirects to login.
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [fullName, setFullName] = useState<string>('');
   const [error, setError] = useState<string>('');
   const router = useRouter();
 
@@ -18,38 +19,26 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:8080/auth/login', {
+      const res = await fetch('http://localhost:8080/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }), // backend expects "email"
+        body: JSON.stringify({
+          email,
+          password,
+          fullName,
+          role: 'USER', // hardcoded default role
+          phone: '+254700000000', // hardcoded placeholder
+          organization: 'Bluestron Ltd', // hardcoded placeholder
+        }),
       });
 
       if (res.ok) {
-        const token = await res.text();
-        localStorage.setItem('token', token);
-
-        // Decode JWT payload
-        const parts = token.split('.');
-        if (parts.length !== 3) throw new Error('Invalid token format');
-        const payloadJson = atob(parts[1]);
-        const payload = JSON.parse(payloadJson);
-        console.log('Decoded JWT payload:', payload);
-
-        // Check if user has ADMIN role
-        const authorities: string[] = Array.isArray(payload?.authorities)
-          ? payload.authorities.map((auth: any) =>
-              typeof auth === 'string' ? auth : auth.authority
-            )
-          : [];
-        const isAdmin = authorities.some((auth) => auth.includes('ADMIN'));
-
-        if (isAdmin) router.push('/admin');
-        else router.push('/');
+        router.push('/login'); // after registration, go to login
       } else {
-        setError('Login failed. Please check your credentials.');
+        setError('Registration failed. Please try again.');
       }
     } catch (err) {
-      setError('An error occurred during login.');
+      setError('An error occurred during registration.');
       console.error(err);
     }
   };
@@ -60,10 +49,18 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-96 border border-navyblue"
       >
-        <h2 className="text-2xl mb-4 font-bold text-navyblue">Login</h2>
+        <h2 className="text-2xl mb-4 font-bold text-navyblue">Register</h2>
 
         {error && <p className="text-orange-500 text-sm mb-2">{error}</p>}
 
+        <input
+          type="text"
+          placeholder="Full Name"
+          required
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          className="w-full p-2 mb-3 border rounded focus:outline-orange-500"
+        />
         <input
           type="email"
           placeholder="Email"
@@ -84,7 +81,7 @@ export default function LoginPage() {
           type="submit"
           className="w-full bg-navyblue text-softwhite p-2 rounded hover:bg-orange-500 transition"
         >
-          Login
+          Register
         </button>
       </form>
     </div>
