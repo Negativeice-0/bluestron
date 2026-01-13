@@ -1,137 +1,65 @@
 'use client';
 
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-interface Course {
-  id: number;
-  title: string;
-  slug: string;
-  shortDescription: string;
-  featured: boolean;
-}
 
 export default function HomePage() {
-  const [featured, setFeatured] = useState<Course[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [coursesRes, categoriesRes] = await Promise.all([
-          fetch('http://localhost:8080/api/courses'),
-          fetch('http://localhost:8080/api/categories'),
-        ]);
-        if (coursesRes.ok) {
-          const courses: Course[] = await coursesRes.json();
-          setFeatured(courses.filter((c) => c.featured).slice(0, 6));
-        }
-        if (categoriesRes.ok) setCategories(await categoriesRes.json());
-      } catch (err) {
-        console.error('Home fetch error:', err);
-      }
-    };
-    fetchData();
-  }, []);
-
   return (
-    <div className="min-h-screen bg-white/80">
-      {/* Hero */}
-      <section className="bg-[#000080] text-white">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <h1 className="text-4xl font-bold">Professional Training, Research & Software Development</h1>
-          <p className="mt-3 text-sm opacity-90">
-            Bluestron delivers high-quality courses and services in Data, M&E, and Management.
-          </p>
-          <div className="mt-6 flex gap-3">
-            <Link href="/courses" className="px-5 py-2 bg-orange-500 rounded text-white hover:bg-orange-600 transition">
-              Browse courses
-            </Link>
-            <Link href="/contact" className="px-5 py-2 bg-white text-[#000080] rounded hover:bg-gray-100 transition">
-              Enquire
-            </Link>
-          </div>
+    <div className="container mx-auto px-6 py-12">
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center"
+      >
+        <h1 className="text-5xl font-bold text-purple-500 mb-6">
+          Professional Training, Research & Software Development
+        </h1>
+        <p className="text-lg text-gray-700 mb-8">
+          Bluestron delivers expert training and services in data, M&E, and management.
+        </p>
+        <div className="flex justify-center">
+          <Image
+            src="/hero.jpg"
+            alt="Bluestron Hero"
+            width={800}
+            height={400}
+            className="rounded-lg shadow-lg"
+          />
         </div>
-      </section>
-
-      {/* Three-box highlights */}
-      <section className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-[#000080]/10 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-[#000080]">Training</h3>
-          <p className="text-gray-600 text-sm">Courses across Project Management, Data Analysis, M&E, GIS & IT.</p>
-          <Link href="/courses" className="inline-block mt-3 text-orange-500 hover:text-orange-600 text-sm">
-            Learn more →
+        <div className="mt-10 flex justify-center space-x-4">
+          <Link href="/courses" className="bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold shadow-md">
+            Register Now
+          </Link>
+          <Link href="/contact" className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold shadow-md">
+            Enquire
+          </Link>
+          <Link href="/about" className="bg-purple-500 text-white px-6 py-3 rounded-lg font-semibold shadow-md">
+            Learn More
           </Link>
         </div>
-        <div className="bg-white border border-[#000080]/10 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-[#000080]">Research Services</h3>
-          <p className="text-gray-600 text-sm">Baseline, midline, endline evaluations and custom consultancy.</p>
-          <Link href="/services/research" className="inline-block mt-3 text-orange-500 hover:text-orange-600 text-sm">
-            Learn more →
-          </Link>
-        </div>
-        <div className="bg-white border border-[#000080]/10 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-[#000080]">Software Development</h3>
-          <p className="text-gray-600 text-sm">Custom web/mobile apps, integrations, automation, dashboards.</p>
-          <Link href="/services/software" className="inline-block mt-3 text-orange-500 hover:text-orange-600 text-sm">
-            Learn more →
-          </Link>
-        </div>
-      </section>
+      </motion.div>
 
-      {/* Featured courses */}
-      <section className="max-w-7xl mx-auto px-6 py-10">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-[#000080]">Featured & Upcoming Courses</h2>
-          <Link href="/courses" className="text-orange-500 hover:text-orange-600 text-sm">
-            View all →
-          </Link>
+      {/* Highlight Boxes */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+        <div className="bg-white rounded-xl shadow-lg p-6 border hover:shadow-xl transition">
+          <h2 className="text-2xl font-semibold text-blue-500 mb-2">Training</h2>
+          <p className="text-gray-600">Browse our professional courses and register today.</p>
+          <Link href="/courses" className="text-orange-500 font-semibold mt-4 inline-block">Register →</Link>
         </div>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featured.map((c) => (
-            <article key={c.id} className="bg-white border border-[#000080]/10 rounded-lg p-4 shadow-sm">
-              <h3 className="text-base font-semibold text-[#000080]">{c.title}</h3>
-              <p className="text-gray-600 text-sm">{c.shortDescription}</p>
-              <Link
-                href={`/courses/${c.slug}`}
-                className="inline-block mt-3 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition text-sm"
-              >
-                Register now
-              </Link>
-            </article>
-          ))}
+        <div className="bg-white rounded-xl shadow-lg p-6 border hover:shadow-xl transition">
+          <h2 className="text-2xl font-semibold text-blue-500 mb-2">Research Services</h2>
+          <p className="text-gray-600">Baseline, midline, endline evaluations and consultancy.</p>
+          <Link href="/research" className="text-orange-500 font-semibold mt-4 inline-block">Enquire →</Link>
         </div>
-      </section>
-
-      {/* Categories quick links */}
-      <section className="max-w-7xl mx-auto px-6 py-10">
-        <h2 className="text-2xl font-bold text-[#000080]">Explore by Category</h2>
-        <div className="mt-4 flex flex-wrap gap-3">
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/courses?category=${cat.id}`}
-              className="px-3 py-2 bg-white border border-[#000080]/10 rounded text-sm hover:bg-gray-100"
-            >
-              {cat.name}
-            </Link>
-          ))}
+        <div className="bg-white rounded-xl shadow-lg p-6 border hover:shadow-xl transition">
+          <h2 className="text-2xl font-semibold text-blue-500 mb-2">Software Development</h2>
+          <p className="text-gray-600">Custom apps, dashboards, and integrations.</p>
+          <Link href="/software" className="text-orange-500 font-semibold mt-4 inline-block">Learn More →</Link>
         </div>
-      </section>
-
-      {/* Testimonials placeholder */}
-      <section className="bg-white border-t border-[#000080]/10">
-        <div className="max-w-7xl mx-auto px-6 py-10">
-          <h2 className="text-2xl font-bold text-[#000080]">Testimonials</h2>
-          <p className="text-gray-600 text-sm">Success stories coming soon.</p>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,11 @@
 package co.ke.bluestron.bsapi.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import co.ke.bluestron.bsapi.entity.Category;
+import co.ke.bluestron.bsapi.model.Category;
 
-@Repository
-public interface CategoryRepository extends JpaRepository<Category, Integer> {
-    // Spring Data JPA will implement basic CRUD operations automatically
-    // Custom query methods can be added here
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+    Optional<Category> findBySlug(String slug);  // Find a category by its URL handle
 }
