@@ -1,4 +1,5 @@
 -- Categories are the bedrock – the taxonomy that organizes all learning content.
+-- Think indexing no post required, just pure structure.
 CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,        -- e.g., "Data Science", "Bioinformatics"
