@@ -1,51 +1,101 @@
 'use client';
 
-import { useState } from 'react';
+import { Course, Registration } from '@/types/index';
+import React, { useState } from 'react';
 
 interface Props {
-  courseId: number;
+  course: Course;
 }
 
-export default function RegistrationForm({ courseId }: Props) {
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+export default function RegistrationForm({ course }: Props) {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  // We mirror the exact JSON structure from your successful curl command
+  const [formData, setFormData] = useState<Registration>({
+    fullName: '',
+    email: '',
+    phone: '',
+    organization: '',
+    role: '',
+    status: 'PENDING',
+    paymentOption: 'Invoice',
+    course: { id: course.id } // Pre-populated from the current course
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('loading');
+    setLoading(true);
+
     try {
-      const res = await fetch(`${process.env.API_URL}/api/courses/${courseId}/register`, {
+      const response = await fetch('http://localhost:8080/api/registrations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify(formData),
       });
-      if (!res.ok) throw new Error('Registration failed');
-      setStatus('success');
-    } catch {
-      setStatus('error');
+
+      if (response.ok) {
+        setSuccess(true);
+        // Page 9 PDF requirement: Show confirmation message
+      } else {
+        const errorData = await response.json();
+        console.error("Backend validation error:", errorData);
+      }
+    } catch (err) {
+      console.error("Connection failed:", err);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  if (success) {
+    return (
+      <div className="p-8 text-center bg-green-50 rounded-xl border border-green-200">
+        <h3 className="text-2xl font-bold text-green-800">Registration Received!</h3>
+        <p className="text-green-700 mt-2">Check your email for the course details and invoice.</p>
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow">
-      <h3 className="text-xl font-bold mb-4">Register for this course</h3>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Your email"
-        className="w-full border rounded p-2 mb-4"
-        required
-      />
-      <button
-        type="submit"
-        disabled={status === 'loading'}
-        className="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition"
+    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg border border-slate-200 space-y-4">
+      <h3 className="text-xl font-bold text-blue-900 mb-4">Enroll in {course.title}</h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input 
+          type="text" placeholder="Full Name" required
+          className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          onChange={e => setFormData({...formData, fullName: e.target.value})}
+        />
+        <input 
+          type="email" placeholder="Email Address" required
+          className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          onChange={e => setFormData({...formData, email: e.target.value})}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input 
+          type="tel" placeholder="Phone Number"
+          className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          onChange={e => setFormData({...formData, phone: e.target.value})}
+        />
+        <select 
+          className="p-3 border rounded-lg bg-white"
+          onChange={e => setFormData({...formData, paymentOption: e.target.value as 'Online' | 'Invoice'})}
+        >
+          <option value="Invoice">Invoice Me</option>
+          <option value="Online">Pay Online</option>
+        </select>
+      </div>
+
+      <button 
+        type="submit" 
+        disabled={loading}
+        className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-all disabled:bg-slate-300 cursor-pointer"
       >
-        {status === 'loading' ? 'Submitting...' : 'Register'}
+        {loading ? "Processing..." : "CONFIRM ENROLLMENT"}
       </button>
-      {status === 'success' && <p className="text-green-600 mt-2">Registration successful!</p>}
-      {status === 'error' && <p className="text-red-600 mt-2">Something went wrong.</p>}
     </form>
   );
 }
